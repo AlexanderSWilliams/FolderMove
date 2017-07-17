@@ -9,7 +9,7 @@ namespace FolderMove
 {
     internal class Program
     {
-        public static void MoveFolder(string folder, string path)
+        public static string MoveFolder(string folder, string path)
         {
             var FolderName = System.IO.Path.GetFileName(folder);
             var FolderSpaceIndex = FolderName.LastIndexOf(' ');
@@ -40,6 +40,7 @@ namespace FolderMove
             var Suffix = FolderNumbers.Any() ? " " + NextNumber.ToString().PadLeft(3, '0') : "";
 
             Directory.Move(folder, path + "\\" + FolderName + Suffix);
+            return path + "\\" + FolderName + Suffix;
         }
 
         private static void Main(string[] args)
@@ -60,10 +61,11 @@ namespace FolderMove
 
             if (Folder != null)
             {
-                var di = new DirectoryInfo(Folder);
-                di.Attributes &= Hide ? FileAttributes.Hidden : ~FileAttributes.Hidden;
-
-                MoveFolder(Folder, DestinationPath);
+                var di = new DirectoryInfo(MoveFolder(Folder, DestinationPath));
+                if (Hide)
+                    di.Attributes |= FileAttributes.Hidden;
+                else
+                    di.Attributes &= ~FileAttributes.Hidden;
             }
             else
                 Console.WriteLine("There was no subfolder found in " + SourcePath);
